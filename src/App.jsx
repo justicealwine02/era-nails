@@ -16,6 +16,7 @@ const style = `
   .section-subtitle { font-family: 'Jost', sans-serif; font-size: 0.95rem; color: #4A6358; font-weight: 300; line-height: 1.7; }
   .btn-primary { background: #1B3A2D; color: #F4F7F4; border: none; padding: 14px 32px; font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; border-radius: 2px; }
   .btn-primary:hover { background: #2A5240; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(27,58,45,0.3); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
   .btn-outline { background: transparent; color: #1B3A2D; border: 1.5px solid #1B3A2D; padding: 13px 32px; font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; border-radius: 2px; }
   .btn-outline:hover { background: #1B3A2D; color: #F4F7F4; }
   .tab-btn { background: none; border: none; font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 10px 20px; border-radius: 30px; transition: all 0.2s; color: #4A6358; }
@@ -28,6 +29,17 @@ const style = `
   .gallery-cell:hover .gallery-overlay { opacity: 1; }
   .star { color: #C8A96E; font-size: 1rem; }
   a { color: #1B3A2D; }
+  input, select, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid #B8D4B8; border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: #0F1F18; background: white; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: #1B3A2D; }
+  label { font-family: 'Jost', sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6358; margin-bottom: 6px; display: block; }
+  .size-btn { padding: 8px 14px; border: 1.5px solid #B8D4B8; border-radius: 8px; background: white; font-family: 'Jost', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; color: #0F1F18; }
+  .size-btn.active { background: #1B3A2D; color: white; border-color: #1B3A2D; }
+  .size-btn:hover:not(.active) { border-color: #1B3A2D; }
+  .art-btn { padding: 12px 16px; border: 1.5px solid #B8D4B8; border-radius: 10px; background: white; font-family: 'Jost', sans-serif; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; color: #0F1F18; text-align: center; }
+  .art-btn.active { background: #1B3A2D; color: white; border-color: #1B3A2D; }
+  .art-btn:hover:not(.active) { border-color: #1B3A2D; }
+  .finger-row { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F0F7F0; }
+  .order-summary { background: linear-gradient(135deg, #1B3A2D, #0F2D1F); border-radius: 16px; padding: 24px; color: white; position: sticky; top: 100px; }
 `;
 
 const GALLERY_PHOTOS = [
@@ -79,7 +91,18 @@ const REVIEWS = [
   { name: "Rachel", rating: 5, text: "I had a great experience with Lizzie. She did a fantastic job on my nails. She was very gentle. I asked lots of questions, and she was more than welcome to answer all of them. I highly recommend.", service: "Gel Manicure" },
 ];
 
-const NAV_ITEMS = ["Services", "Gallery", "Book", "Reviews", "Policy"];
+const FINGERS = ["Thumb","Index","Middle","Ring","Pinky"];
+const SIZES = ["XXS","XS","S","M","L","XL","XXL"];
+const SHAPES = ["Square","Round","Almond","Coffin","Stiletto"];
+const LENGTHS = ["Short","Medium","Long"];
+const ART_TIERS = [
+  { label: "No Nail Art", price: 0, desc: "Solid color or simple finish" },
+  { label: "Tier 1 — Simple", price: 5, desc: "1-2 colors, basic designs" },
+  { label: "Tier 2 — Detailed", price: 10, desc: "Patterns, gradients, detail work" },
+  { label: "Tier 3 — Complex", price: 15, desc: "Gems, chrome, intricate art" },
+];
+
+const NAV_ITEMS = ["Services", "Gallery", "Book", "Press-Ons", "Reviews", "Policy"];
 
 function Logo({ size = 36 }) {
   return (
@@ -97,6 +120,198 @@ function Logo({ size = 36 }) {
 
 function Stars({ n }) {
   return <span>{Array.from({ length: 5 }, (_, i) => <span key={i} className="star">{i < n ? "★" : "☆"}</span>)}</span>;
+}
+
+function PressOnPage() {
+  const BASE_PRICE = 40;
+  const [shape, setShape] = useState("");
+  const [length, setLength] = useState("");
+  const [artTier, setArtTier] = useState(0);
+  const [sizes, setSizes] = useState({ L: {}, R: {} });
+  const [design, setDesign] = useState("");
+  const [address, setAddress] = useState({ name: "", street: "", city: "", state: "", zip: "", email: "", phone: "" });
+  const [step, setStep] = useState(1);
+  const [done, setDone] = useState(false);
+
+  const artPrice = ART_TIERS[artTier].price;
+  const total = BASE_PRICE + artPrice;
+
+  const setSize = (hand, finger, size) => setSizes(prev => ({ ...prev, [hand]: { ...prev[hand], [finger]: size } }));
+  const sizesComplete = () => FINGERS.every(f => sizes.L[f] && sizes.R[f]);
+
+  const step1Valid = shape && length;
+  const step2Valid = sizesComplete();
+  const step3Valid = design.trim().length > 0;
+  const step4Valid = address.name && address.street && address.city && address.state && address.zip && address.email;
+
+  if (done) return (
+    <div style={{ minHeight: "100vh", background: "#F4F7F4", padding: "80px 40px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "white", borderRadius: 20, padding: 60, textAlign: "center", maxWidth: 560, boxShadow: "0 4px 40px rgba(27,58,45,0.08)", animation: "fadeUp 0.5s ease" }}>
+        <div style={{ fontSize: "3.5rem", marginBottom: 20 }}>🎉</div>
+        <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "2rem", color: "#0F1F18", marginBottom: 12 }}>Order Received!</h3>
+        <p style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.88rem", color: "#4A6358", marginBottom: 8 }}>Thanks {address.name}! Lizzie will review your order and send a payment link to:</p>
+        <p style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.88rem", color: "#1B3A2D", fontWeight: 600, marginBottom: 24 }}>{address.email}</p>
+        <div style={{ background: "#D9E8D9", borderRadius: 12, padding: 20, marginBottom: 28, textAlign: "left" }}>
+          <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.72rem", color: "#1B3A2D", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Order Summary</div>
+          <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.85rem", color: "#0F1F18", lineHeight: 1.8 }}>
+            <div>💅 {shape} · {length}</div>
+            <div>🎨 {ART_TIERS[artTier].label}</div>
+            <div>📦 Ships to {address.city}, {address.state}</div>
+            <div style={{ marginTop: 8, fontWeight: 600, color: "#1B3A2D" }}>Total: ${total}</div>
+          </div>
+        </div>
+        <p style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.78rem", color: "#4A6358", marginBottom: 24 }}>Your custom set will be ready in <strong>7-10 business days</strong> after payment is confirmed. Lizzie will reach out if she has any questions about your design.</p>
+        <button className="btn-primary" onClick={() => { setDone(false); setStep(1); setShape(""); setLength(""); setArtTier(0); setSizes({ L: {}, R: {} }); setDesign(""); setAddress({ name: "", street: "", city: "", state: "", zip: "", email: "", phone: "" }); }}>
+          Order Another Set
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#F4F7F4", padding: "80px 40px" }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+        <div className="section-label">Ship Anywhere</div>
+        <h2 className="section-title">Custom Press-On Sets</h2>
+        <p className="section-subtitle" style={{ marginBottom: 16, maxWidth: 560 }}>Can't make it to Ashley? No problem. Order a custom handmade set from Lizzie and get it shipped straight to your door in 7-10 business days.</p>
+        <div style={{ display: "flex", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
+          {[["💅","Custom handmade"],["📦","Ships anywhere in the US"],["🎨","Your design, your sizes"],["⏱️","7-10 business days"]].map(([icon, text]) => (
+            <div key={text} style={{ background: "white", borderRadius: 20, padding: "8px 16px", fontFamily: "'Jost', sans-serif", fontSize: "0.78rem", color: "#1B3A2D", fontWeight: 500, border: "1px solid #D9E8D9" }}>{icon} {text}</div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 36 }}>
+          {["Style","Sizing","Design","Shipping"].map((s, i) => (
+            <div key={s} style={{ flex: 1 }}>
+              <div style={{ height: 3, borderRadius: 2, background: i + 1 <= step ? "#1B3A2D" : "#D9E8D9", transition: "background 0.3s", marginBottom: 6 }} />
+              <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.65rem", color: i + 1 === step ? "#1B3A2D" : "#4A6358", fontWeight: i + 1 === step ? 600 : 400, letterSpacing: "0.1em", textTransform: "uppercase" }}>{s}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 32, alignItems: "start" }}>
+          <div>
+            {step === 1 && (
+              <div style={{ background: "white", borderRadius: 16, padding: 32, boxShadow: "0 4px 24px rgba(27,58,45,0.06)", animation: "fadeUp 0.3s ease" }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", color: "#0F1F18", marginBottom: 24 }}>Choose Your Style</h3>
+                <div style={{ marginBottom: 28 }}>
+                  <label>Shape</label>
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+                    {SHAPES.map(s => <button key={s} className={`size-btn ${shape === s ? "active" : ""}`} onClick={() => setShape(s)}>{s}</button>)}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 32 }}>
+                  <label>Length</label>
+                  <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                    {LENGTHS.map(l => <button key={l} className={`size-btn ${length === l ? "active" : ""}`} onClick={() => setLength(l)}>{l}</button>)}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 32 }}>
+                  <label>Nail Art</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 8 }}>
+                    {ART_TIERS.map((tier, i) => (
+                      <button key={i} className={`art-btn ${artTier === i ? "active" : ""}`} onClick={() => setArtTier(i)}>
+                        <div style={{ fontWeight: 600, marginBottom: 3 }}>{tier.label}</div>
+                        <div style={{ fontSize: "0.72rem", opacity: 0.75 }}>{tier.desc}</div>
+                        <div style={{ fontSize: "0.78rem", marginTop: 4, color: artTier === i ? "#C8A96E" : "#1B3A2D", fontWeight: 600 }}>{tier.price === 0 ? "Included" : `+$${tier.price}/nail`}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <button className="btn-primary" style={{ width: "100%" }} disabled={!step1Valid} onClick={() => setStep(2)}>Continue to Sizing →</button>
+              </div>
+            )}
+            {step === 2 && (
+              <div style={{ background: "white", borderRadius: 16, padding: 32, boxShadow: "0 4px 24px rgba(27,58,45,0.06)", animation: "fadeUp 0.3s ease" }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", color: "#0F1F18", marginBottom: 8 }}>Your Nail Sizes</h3>
+                <p style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.82rem", color: "#4A6358", marginBottom: 24, lineHeight: 1.6 }}>Select a size for each finger on both hands. Not sure? Measure the widest part of your nail bed in mm: under 14 = XXS, 14-15 = XS, 15-16 = S, 16-17 = M, 17-18 = L, 18-19 = XL, 19+ = XXL.</p>
+                {["L", "R"].map(hand => (
+                  <div key={hand} style={{ marginBottom: 28 }}>
+                    <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1B3A2D", marginBottom: 12 }}>{hand === "L" ? "Left Hand" : "Right Hand"}</div>
+                    {FINGERS.map(finger => (
+                      <div key={finger} className="finger-row">
+                        <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.82rem", color: "#0F1F18" }}>{finger}</div>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          {SIZES.map(size => <button key={size} className={`size-btn ${sizes[hand][finger] === size ? "active" : ""}`} style={{ padding: "5px 10px", fontSize: "0.72rem" }} onClick={() => setSize(hand, finger, size)}>{size}</button>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+                <div style={{ display: "flex", gap: 12 }}>
+                  <button className="btn-outline" style={{ flex: 1 }} onClick={() => setStep(1)}>← Back</button>
+                  <button className="btn-primary" style={{ flex: 2 }} disabled={!step2Valid} onClick={() => setStep(3)}>Continue to Design →</button>
+                </div>
+              </div>
+            )}
+            {step === 3 && (
+              <div style={{ background: "white", borderRadius: 16, padding: 32, boxShadow: "0 4px 24px rgba(27,58,45,0.06)", animation: "fadeUp 0.3s ease" }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", color: "#0F1F18", marginBottom: 8 }}>Describe Your Design</h3>
+                <p style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.82rem", color: "#4A6358", marginBottom: 24, lineHeight: 1.6 }}>Tell Lizzie exactly what you're envisioning. Include colors, vibe, inspo, anything specific. The more detail the better.</p>
+                <div style={{ marginBottom: 20 }}>
+                  <label>Colors & Vibe *</label>
+                  <textarea rows={4} placeholder="e.g. Nude pink base with gold chrome on ring fingers, simple white flower detail on index nails. Going for an elegant clean look..." value={design} onChange={e => setDesign(e.target.value)} />
+                </div>
+                <div style={{ marginBottom: 28, background: "#D9E8D9", borderRadius: 12, padding: 16 }}>
+                  <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.75rem", color: "#1B3A2D", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>💡 Tip</div>
+                  <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.8rem", color: "#4A6358", lineHeight: 1.6 }}>You can also send inspo photos to <strong>eranailss@outlook.com</strong> after ordering. Reference your name so Lizzie can match it up.</div>
+                </div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <button className="btn-outline" style={{ flex: 1 }} onClick={() => setStep(2)}>← Back</button>
+                  <button className="btn-primary" style={{ flex: 2 }} disabled={!step3Valid} onClick={() => setStep(4)}>Continue to Shipping →</button>
+                </div>
+              </div>
+            )}
+            {step === 4 && (
+              <div style={{ background: "white", borderRadius: 16, padding: 32, boxShadow: "0 4px 24px rgba(27,58,45,0.06)", animation: "fadeUp 0.3s ease" }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.5rem", color: "#0F1F18", marginBottom: 24 }}>Shipping Info</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 28 }}>
+                  <div><label>Full Name *</label><input placeholder="Your name" value={address.name} onChange={e => setAddress(a => ({ ...a, name: e.target.value }))} /></div>
+                  <div><label>Email *</label><input placeholder="you@email.com" value={address.email} onChange={e => setAddress(a => ({ ...a, email: e.target.value }))} /></div>
+                  <div><label>Phone</label><input placeholder="(555) 000-0000" value={address.phone} onChange={e => setAddress(a => ({ ...a, phone: e.target.value }))} /></div>
+                  <div><label>Street Address *</label><input placeholder="123 Main St" value={address.street} onChange={e => setAddress(a => ({ ...a, street: e.target.value }))} /></div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 80px", gap: 12 }}>
+                    <div><label>City *</label><input placeholder="City" value={address.city} onChange={e => setAddress(a => ({ ...a, city: e.target.value }))} /></div>
+                    <div><label>State *</label><input placeholder="IN" maxLength={2} value={address.state} onChange={e => setAddress(a => ({ ...a, state: e.target.value.toUpperCase() }))} /></div>
+                  </div>
+                  <div><label>ZIP Code *</label><input placeholder="46705" value={address.zip} onChange={e => setAddress(a => ({ ...a, zip: e.target.value }))} /></div>
+                </div>
+                <div style={{ background: "#D9E8D9", borderRadius: 12, padding: 16, marginBottom: 24 }}>
+                  <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.75rem", color: "#1B3A2D", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>How Payment Works</div>
+                  <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.8rem", color: "#4A6358", lineHeight: 1.6 }}>After submitting, Lizzie will send a secure payment link to your email within 24 hours. Your set goes into production once payment is confirmed. Total due: <strong style={{ color: "#1B3A2D" }}>${total}</strong></div>
+                </div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <button className="btn-outline" style={{ flex: 1 }} onClick={() => setStep(3)}>← Back</button>
+                  <button className="btn-primary" style={{ flex: 2 }} disabled={!step4Valid} onClick={() => setDone(true)}>Submit Order ✦</button>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="order-summary">
+            <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.65rem", color: "#C8A96E", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>Order Summary</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.1rem", color: "white", marginBottom: 20 }}>Custom Press-On Set</div>
+            {[["Base Set", `$${BASE_PRICE}`], [ART_TIERS[artTier].label, artPrice > 0 ? `+$${artPrice}` : "Included"]].map(([label, val]) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.8rem", color: "rgba(255,255,255,0.65)" }}>{label}</div>
+                <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.8rem", color: "#C8A96E", fontWeight: 500 }}>{val}</div>
+              </div>
+            ))}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 14, marginTop: 4, display: "flex", justifyContent: "space-between" }}>
+              <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.85rem", color: "white", fontWeight: 600 }}>Total</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.4rem", color: "#C8A96E", fontWeight: 600 }}>${total}</div>
+            </div>
+            <div style={{ marginTop: 20, borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 16 }}>
+              {shape && <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>💅 {shape}{length ? ` · ${length}` : ""}</div>}
+              {sizesComplete() && <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>📏 Sizes confirmed</div>}
+              {design && <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>🎨 Design described</div>}
+              {address.city && <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>📦 Ships to {address.city}, {address.state}</div>}
+            </div>
+            <div style={{ marginTop: 20, background: "rgba(200,169,110,0.15)", borderRadius: 10, padding: 14 }}>
+              <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.72rem", color: "#C8A96E", lineHeight: 1.6 }}>✦ Payment link sent after order<br />✦ Ships in 7-10 business days<br />✦ US shipping included in price</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function EraApp() {
@@ -117,8 +332,8 @@ export default function EraApp() {
         <div style={{ position: "absolute", width: 350, height: 350, bottom: 40, left: -80, background: "rgba(200,169,110,0.05)", borderRadius: "50%", filter: "blur(70px)", pointerEvents: "none" }} />
         <nav style={{ padding: "24px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 10 }}>
           <Logo />
-          <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-            {NAV_ITEMS.map(s => <button key={s} className="nav-link" onClick={() => navigate(s.toLowerCase())}>{s}</button>)}
+          <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+            {NAV_ITEMS.map(s => <button key={s} className="nav-link" onClick={() => navigate(s.toLowerCase().replace("-",""))}>{s}</button>)}
             <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" style={{ background: "#C8A96E", color: "#0F1F18", padding: "10px 24px", fontFamily: "'Jost', sans-serif", fontSize: "0.8rem", fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", textDecoration: "none", borderRadius: 2 }}>Book Now</a>
           </div>
         </nav>
@@ -130,7 +345,7 @@ export default function EraApp() {
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", fontSize: "clamp(0.9rem, 1.8vw, 1.2rem)", color: "#B8D4B8", marginBottom: 40, opacity: 0.6 }}>Where every set tells a story.</div>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
             <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" style={{ background: "#C8A96E", color: "#0F1F18", padding: "16px 40px", fontFamily: "'Jost', sans-serif", fontSize: "0.82rem", fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", textDecoration: "none", borderRadius: 2 }}>Book an Appointment</a>
-            <button className="btn-outline" style={{ borderColor: "#B8D4B8", color: "#B8D4B8", fontSize: "0.82rem", padding: "16px 40px" }} onClick={() => navigate("services")}>View Services</button>
+            <button className="btn-outline" style={{ borderColor: "#B8D4B8", color: "#B8D4B8", fontSize: "0.82rem", padding: "16px 40px" }} onClick={() => navigate("pressons")}>Order Press-Ons</button>
           </div>
           <div style={{ display: "flex", gap: 48, marginTop: 72, flexWrap: "wrap", justifyContent: "center" }}>
             {[["5★","Rating"],["🖌️","Handpainted Nail Art"],["💎","Builder Gel Specialist"]].map(([num, label]) => (
@@ -316,8 +531,8 @@ export default function EraApp() {
       {section !== "home" && (
         <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "#1B3A2D", padding: "16px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 2px 20px rgba(15,31,24,0.3)" }}>
           <div style={{ cursor: "pointer" }} onClick={() => navigate("home")}><Logo size={30} /></div>
-          <div style={{ display: "flex", gap: 28, alignItems: "center", flexWrap: "wrap" }}>
-            {NAV_ITEMS.map(s => <button key={s} className={`nav-link ${section === s.toLowerCase() ? "active" : ""}`} onClick={() => navigate(s.toLowerCase())} style={{ fontSize: "0.78rem" }}>{s}</button>)}
+          <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+            {NAV_ITEMS.map(s => <button key={s} className={`nav-link ${section === s.toLowerCase().replace("-","") ? "active" : ""}`} onClick={() => navigate(s.toLowerCase().replace("-",""))} style={{ fontSize: "0.78rem" }}>{s}</button>)}
             <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" style={{ background: "#C8A96E", color: "#0F1F18", padding: "9px 20px", fontSize: "0.75rem", fontFamily: "'Jost', sans-serif", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", textDecoration: "none", borderRadius: 2 }}>Book</a>
           </div>
         </nav>
@@ -326,6 +541,7 @@ export default function EraApp() {
       {section === "services" && renderServices()}
       {section === "gallery"  && renderGallery()}
       {section === "book"     && renderBook()}
+      {section === "pressons" && <PressOnPage />}
       {section === "reviews"  && renderReviews()}
       {section === "policy"   && renderPolicy()}
       <footer style={{ background: "#0F1F18", padding: "48px 40px 32px" }}>
@@ -341,7 +557,7 @@ export default function EraApp() {
             </div>
             <div>
               <div style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "#C8A96E", marginBottom: 14 }}>Navigate</div>
-              {NAV_ITEMS.map(l => <div key={l} style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.82rem", color: "#4A6358", marginBottom: 10, cursor: "pointer" }} onClick={() => navigate(l.toLowerCase())}>{l}</div>)}
+              {NAV_ITEMS.map(l => <div key={l} style={{ fontFamily: "'Jost', sans-serif", fontSize: "0.82rem", color: "#4A6358", marginBottom: 10, cursor: "pointer" }} onClick={() => navigate(l.toLowerCase().replace("-",""))}>{l}</div>)}
             </div>
           </div>
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 24, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
