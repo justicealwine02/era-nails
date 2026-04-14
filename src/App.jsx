@@ -8,20 +8,20 @@ const G = {
 };
 
 const TIERS = [
-  { name: "Bare Era",      min: 0,    max: 99,        icon: "🌱", color: "#8B9E8B", perk: "5% off every booking",          desc: "Just getting started on your nail journey." },
-  { name: "Bloom Era",     min: 100,  max: 299,       icon: "🌸", color: "#C8A96E", perk: "Free nail art upgrade",          desc: "Finding your style and loving every set." },
-  { name: "Glow Era",      min: 300,  max: 599,       icon: "✨", color: "#7EC8A4", perk: "$20 credit + priority booking",  desc: "Your nails are always giving. Always." },
-  { name: "Golden Era",    min: 600,  max: 999,       icon: "👑", color: "#C8A96E", perk: "Free set once per quarter",      desc: "This is your moment. You've arrived." },
-  { name: "Legendary Era", min: 1000, max: Infinity,  icon: "💎", color: "#B8D4FF", perk: "VIP everything — you run this",  desc: "An icon. A regular. A legend." },
+  { name: "Bare Era",      min: 0,    max: 149,      icon: "🌱", color: "#8B9E8B", perk: "Early booking access + birthday bonus points",                    desc: "Welcome to your new ERA. Your journey starts here." },
+  { name: "Bloom Era",     min: 150,  max: 399,      icon: "🌸", color: "#C8A96E", perk: "5% off every booking",                                             desc: "Finding your style and loving every set." },
+  { name: "Glow Era",      min: 400,  max: 799,      icon: "✨", color: "#7EC8A4", perk: "5% off + $20 credit + priority booking slots",                      desc: "Your nails are always giving. Always." },
+  { name: "Golden Era",    min: 800,  max: 999,      icon: "👑", color: "#C8A96E", perk: "10% off every booking + free mani/pedi twice a year",               desc: "This is your moment. You've arrived." },
+  { name: "Legendary Era", min: 1000, max: Infinity, icon: "💎", color: "#B8D4FF", perk: "10% off + free mani/pedi twice a year + VIP everything",           desc: "An icon. A regular. A legend." },
 ];
 
 const REWARDS = [
-  { pts: 50,  label: "Free Cuticle Oil",      icon: "🌿", desc: "Lizzie's homemade cuticle oil" },
-  { pts: 100, label: "$10 Off Any Service",   icon: "💚", desc: "Applied at your next booking" },
-  { pts: 150, label: "Free Tier 1 Nail Art",  icon: "🎨", desc: "Simple accent or chrome" },
-  { pts: 250, label: "Free Add-On Service",   icon: "💅", desc: "Paraffin, massage, or removal" },
-  { pts: 400, label: "$40 Off Any Service",   icon: "✨", desc: "Almost a full set on us" },
-  { pts: 600, label: "Free Full Set",         icon: "👑", desc: "On the house, queen" },
+  { pts: 50,  label: "Free Cuticle Oil",     icon: "🌿", desc: "Lizzie's homemade cuticle oil" },
+  { pts: 100, label: "$10 Off Any Service",  icon: "💚", desc: "Applied at your next booking" },
+  { pts: 150, label: "Free Tier 1 Nail Art", icon: "🎨", desc: "Simple accent or chrome" },
+  { pts: 250, label: "Free Add-On Service",  icon: "💅", desc: "Paraffin, massage, or removal" },
+  { pts: 400, label: "$40 Off Any Service",  icon: "✨", desc: "Almost a full set on us" },
+  { pts: 600, label: "Free Full Set",        icon: "👑", desc: "On the house, queen" },
 ];
 
 const GALLERY_PHOTOS = [
@@ -74,10 +74,10 @@ const SIZES = ["XXS","XS","S","M","L","XL","XXL"];
 const SHAPES = ["Square","Round","Almond","Coffin","Stiletto"];
 const LENGTHS = ["Short","Medium","Long"];
 const ART_TIERS = [
-  { label: "No Nail Art",       price: 0,  desc: "Solid color or simple finish" },
-  { label: "Tier 1 — Accent",   price: 5,  desc: "Chrome or single accent per hand" },
-  { label: "Tier 2 — Statement",price: 10, desc: "French tips or multiple nail art" },
-  { label: "Tier 3 — Detailed", price: 15, desc: "Full handpainted detailed art" },
+  { label: "No Nail Art",        price: 0,  desc: "Solid color or simple finish" },
+  { label: "Tier 1 — Accent",    price: 5,  desc: "Chrome or single accent per hand" },
+  { label: "Tier 2 — Statement", price: 10, desc: "French tips or multiple nail art" },
+  { label: "Tier 3 — Detailed",  price: 15, desc: "Full handpainted detailed art" },
 ];
 
 const NAV_ITEMS = ["About","Services","Gallery","Book","Press-Ons","Loyalty","Reviews","Policy"];
@@ -93,55 +93,72 @@ const css = `
   @keyframes glitter{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
   @keyframes pageIn{from{opacity:0;transform:translateY(16px) scale(0.99)}to{opacity:1;transform:translateY(0) scale(1)}}
   .page-wrap{animation:pageIn 0.45s cubic-bezier(0.22,1,0.36,1) both;}
-  .nav-link{color:#F4F7F4;font-family:'Jost',sans-serif;font-weight:400;font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8;transition:all 0.2s;cursor:pointer;background:none;border:none;}
+  .nav-link{color:#F4F7F4;font-family:'Jost',sans-serif;font-weight:400;font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8;transition:all 0.25s;cursor:pointer;background:none;border:none;position:relative;}
+  .nav-link::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1.5px;background:#C8A96E;transition:width 0.25s ease;}
+  .nav-link:hover::after,.nav-link.active::after{width:100%;}
   .nav-link:hover,.nav-link.active{opacity:1;color:#C8A96E;}
   .btn-gold{background:#C8A96E;color:#0A1A0F;border:none;padding:14px 32px;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:all 0.25s;border-radius:2px;display:inline-block;text-decoration:none;}
-  .btn-gold:hover{background:#E8D5A8;transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,169,110,0.4);}
+  .btn-gold:hover{background:#E8D5A8;transform:translateY(-2px);box-shadow:0 10px 32px rgba(200,169,110,0.45);}
   .btn-dark{background:#1B3A2D;color:#F4F7F4;border:none;padding:14px 32px;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:all 0.25s;border-radius:2px;display:inline-block;text-decoration:none;}
-  .btn-dark:hover{background:#2A5240;transform:translateY(-2px);box-shadow:0 8px 24px rgba(27,58,45,0.35);}
+  .btn-dark:hover{background:#2A5240;transform:translateY(-2px);box-shadow:0 10px 28px rgba(27,58,45,0.4);}
   .btn-dark:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
   .btn-outline{background:transparent;color:#1B3A2D;border:1.5px solid #1B3A2D;padding:13px 32px;font-family:'Jost',sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:all 0.25s;border-radius:2px;}
-  .btn-outline:hover{background:#1B3A2D;color:#F4F7F4;}
+  .btn-outline:hover{background:#1B3A2D;color:#F4F7F4;transform:translateY(-1px);}
   .section-label{font-family:'Jost',sans-serif;font-size:0.68rem;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:#C8A96E;margin-bottom:12px;}
   .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:300;color:#0F1F18;line-height:1.1;margin-bottom:16px;}
   .section-sub{font-family:'Jost',sans-serif;font-size:0.92rem;color:#4A6358;font-weight:300;line-height:1.75;}
   .tab-btn{background:none;border:none;font-family:'Jost',sans-serif;font-size:0.78rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;padding:10px 20px;border-radius:30px;transition:all 0.2s;color:#4A6358;}
   .tab-btn.active{background:#1B3A2D;color:#F4F7F4;}
-  .policy-item{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid #D9E8D9;align-items:flex-start;}
-  .gallery-cell{border-radius:14px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:1;}
-  .gallery-cell img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s cubic-bezier(0.22,1,0.36,1);display:block;}
-  .gallery-cell:hover img{transform:scale(1.08);}
-  .gallery-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,26,15,0.85),transparent 55%);opacity:0;transition:opacity 0.35s;display:flex;align-items:flex-end;padding:18px;}
-  .gallery-cell:hover .gallery-overlay{opacity:1;}
-  .gallery-cell:nth-child(3n+2){aspect-ratio:0.78;}
-  .lightbox{position:fixed;inset:0;background:rgba(10,26,15,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s ease;backdrop-filter:blur(8px);}
-  .lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:12px;animation:fadeUp 0.35s ease;}
-  .lightbox-close{position:absolute;top:24px;right:28px;background:none;border:none;color:#C8A96E;font-size:2rem;cursor:pointer;opacity:0.8;transition:opacity 0.2s;}
-  .lightbox-close:hover{opacity:1;}
+  .tab-btn:hover:not(.active){background:#D9E8D9;color:#1B3A2D;}
   .star{color:#C8A96E;font-size:1rem;}
-  input,select,textarea{width:100%;padding:12px 16px;border:1.5px solid #B8D4B8;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.88rem;color:#0F1F18;background:white;outline:none;transition:border-color 0.2s;}
-  input:focus,select:focus,textarea:focus{border-color:#1B3A2D;}
+  input,select,textarea{width:100%;padding:12px 16px;border:1.5px solid #B8D4B8;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.88rem;color:#0F1F18;background:white;outline:none;transition:all 0.2s;}
+  input:focus,select:focus,textarea:focus{border-color:#1B3A2D;box-shadow:0 0 0 3px rgba(27,58,45,0.08);}
   label{font-family:'Jost',sans-serif;font-size:0.72rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#4A6358;margin-bottom:7px;display:block;}
   .size-btn{padding:7px 13px;border:1.5px solid #B8D4B8;border-radius:8px;background:white;font-family:'Jost',sans-serif;font-size:0.76rem;cursor:pointer;transition:all 0.2s;color:#0F1F18;}
-  .size-btn.active{background:#1B3A2D;color:white;border-color:#1B3A2D;}
-  .size-btn:hover:not(.active){border-color:#1B3A2D;}
+  .size-btn.active{background:#1B3A2D;color:white;border-color:#1B3A2D;transform:scale(1.05);}
+  .size-btn:hover:not(.active){border-color:#1B3A2D;color:#1B3A2D;transform:scale(1.03);}
   .art-btn{padding:14px 16px;border:1.5px solid #B8D4B8;border-radius:12px;background:white;font-family:'Jost',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;color:#0F1F18;text-align:center;}
   .art-btn.active{background:#1B3A2D;color:white;border-color:#1B3A2D;}
-  .art-btn:hover:not(.active){border-color:#1B3A2D;}
+  .art-btn:hover:not(.active){border-color:#1B3A2D;transform:translateY(-2px);box-shadow:0 6px 20px rgba(27,58,45,0.12);}
   .finger-row{display:grid;grid-template-columns:130px 1fr;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F0F7F0;}
   .order-summary{background:linear-gradient(160deg,#1B3A2D,#0A1A0F);border-radius:18px;padding:26px;color:white;position:sticky;top:100px;}
   .tier-card{border-radius:16px;padding:20px;border:1.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);transition:all 0.3s;position:relative;overflow:hidden;}
-  .tier-card.active-tier{border-color:#C8A96E;background:rgba(200,169,110,0.1);}
-  .tier-card:hover{transform:translateY(-2px);}
-  .reward-card{background:white;border-radius:14px;padding:20px;border:1.5px solid #D9E8D9;transition:all 0.2s;cursor:pointer;position:relative;overflow:hidden;}
-  .reward-card:hover{border-color:#C8A96E;transform:translateY(-2px);box-shadow:0 8px 28px rgba(27,58,45,0.1);}
+  .tier-card:hover{transform:translateY(-3px);border-color:rgba(200,169,110,0.4);}
+  .reward-card{background:white;border-radius:14px;padding:20px;border:1.5px solid #D9E8D9;transition:all 0.25s;cursor:pointer;position:relative;overflow:hidden;}
+  .reward-card::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.08),transparent);transition:left 0.5s;}
+  .reward-card:hover::before{left:150%;}
+  .reward-card:hover{border-color:#C8A96E;transform:translateY(-3px);box-shadow:0 12px 32px rgba(27,58,45,0.12);}
   .reward-card.redeemable{border-color:#1B3A2D;}
-  .upload-area{border:2px dashed #B8D4B8;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;background:white;}
-  .upload-area:hover{border-color:#1B3A2D;background:#D9E8D9;}
+  .upload-area{border:2px dashed #B8D4B8;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all 0.25s;background:white;}
+  .upload-area:hover{border-color:#1B3A2D;background:#D9E8D9;transform:scale(1.01);}
   .glitter-text{background:linear-gradient(135deg,#C8A96E 0%,#E8D5A8 30%,#C8A96E 60%,#FFF8E7 80%,#C8A96E 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glitter 4s linear infinite;}
-  .card-hover{transition:all 0.25s cubic-bezier(0.22,1,0.36,1);}
-  .card-hover:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(27,58,45,0.12);}
-  .floating-nail{position:fixed;pointer-events:none;animation:float 3s ease-in-out infinite;z-index:0;opacity:0.1;}
+  .card-hover{transition:all 0.28s cubic-bezier(0.22,1,0.36,1);}
+  .card-hover:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(27,58,45,0.14);}
+  .floating-nail{position:fixed;pointer-events:none;font-size:1.2rem;animation:float 3s ease-in-out infinite;z-index:0;opacity:0.1;}
+  .service-row{position:relative;overflow:hidden;transition:all 0.22s;}
+  .service-row:hover{background:#D9E8D9!important;}
+  .service-row .book-hint{position:absolute;right:-120px;top:50%;transform:translateY(-50%);font-family:'Jost',sans-serif;font-size:0.72rem;color:#C8A96E;letter-spacing:0.1em;transition:right 0.25s;white-space:nowrap;}
+  .service-row:hover .book-hint{right:20px;}
+  .service-row:hover{padding-right:130px!important;}
+  .gallery-cell{border-radius:14px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:1;}
+  .gallery-cell img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s cubic-bezier(0.22,1,0.36,1);display:block;}
+  .gallery-cell:hover img{transform:scale(1.1);}
+  .gallery-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,26,15,0.9),rgba(10,26,15,0.2) 50%,transparent 100%);opacity:0;transition:opacity 0.35s;display:flex;align-items:flex-end;padding:18px;}
+  .gallery-cell:hover .gallery-overlay{opacity:1;}
+  .gallery-cell:nth-child(3n+2){aspect-ratio:0.78;}
+  .lightbox{position:fixed;inset:0;background:rgba(10,26,15,0.97);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s ease;backdrop-filter:blur(12px);}
+  .lightbox img{max-width:88vw;max-height:88vh;object-fit:contain;border-radius:16px;animation:fadeUp 0.4s cubic-bezier(0.22,1,0.36,1);box-shadow:0 32px 80px rgba(0,0,0,0.6);}
+  .lightbox-close{position:absolute;top:24px;right:28px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:1.1rem;cursor:pointer;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .lightbox-close:hover{background:rgba(255,255,255,0.2);transform:scale(1.1);}
+  .policy-item{display:flex;gap:14px;padding:18px 12px;border-bottom:1px solid #D9E8D9;align-items:flex-start;border-radius:8px;transition:background 0.2s;}
+  .policy-item:hover{background:#D9E8D9;}
+  .review-card{background:white;border-radius:16px;padding:28px;box-shadow:0 2px 20px rgba(27,58,45,0.05);transition:all 0.3s;position:relative;overflow:hidden;}
+  .review-card::before{content:'"';position:absolute;top:-10px;right:16px;font-family:'Cormorant Garamond',serif;font-size:8rem;color:#D9E8D9;line-height:1;pointer-events:none;}
+  .review-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(27,58,45,0.1);}
+  .about-value-card{background:white;border-radius:16px;padding:24px;border:1px solid #D9E8D9;text-align:center;transition:all 0.3s;position:relative;overflow:hidden;}
+  .about-value-card::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#C8A96E,#1B3A2D);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+  .about-value-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(27,58,45,0.1);}
+  .about-value-card:hover::after{transform:scaleX(1);}
 `;
 
 function Logo({ size = 36, light = true }) {
@@ -160,6 +177,22 @@ function Stars({ n }) {
   return <span>{Array.from({length:5},(_,i) => <span key={i} className="star">{i<n?"★":"☆"}</span>)}</span>;
 }
 
+const NAIL_EMOJIS = ["💅","✨","💎","🌸","👑","🌿","💚"];
+function NailTransition({ active }) {
+  const emoji = NAIL_EMOJIS[Math.floor(Math.random() * NAIL_EMOJIS.length)];
+  if (!active) return null;
+  return (
+    <div style={{ position:"fixed", inset:0, zIndex:9997, pointerEvents:"none", display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+      <div style={{ position:"absolute", inset:0, background:"linear-gradient(135deg,#1B3A2D,#0A1A0F)", animation:"nailWipeIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards" }}/>
+      <div style={{ position:"relative", zIndex:1, fontSize:"4rem", animation:"nailFallIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.1s both" }}>{emoji}</div>
+      <style>{`
+        @keyframes nailWipeIn{0%{clip-path:circle(0% at 50% 50%)}100%{clip-path:circle(150% at 50% 50%)}}
+        @keyframes nailFallIn{0%{transform:translateY(-80px) rotate(-20deg);opacity:0}100%{transform:translateY(0) rotate(0);opacity:1}}
+      `}</style>
+    </div>
+  );
+}
+
 function getTier(pts) { return [...TIERS].reverse().find(t => pts >= t.min) || TIERS[0]; }
 
 function TierRing({ pts }) {
@@ -172,9 +205,7 @@ function TierRing({ pts }) {
       <div style={{ position:"relative", width:100, height:100 }}>
         <svg width={100} height={100} style={{ transform:"rotate(-90deg)" }}>
           <circle cx={50} cy={50} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={7}/>
-          <circle cx={50} cy={50} r={r} fill="none" stroke={tier.color} strokeWidth={7}
-            strokeDasharray={circ} strokeDashoffset={circ*(1-pct/100)} strokeLinecap="round"
-            style={{ transition:"stroke-dashoffset 1.2s ease" }}/>
+          <circle cx={50} cy={50} r={r} fill="none" stroke={tier.color} strokeWidth={7} strokeDasharray={circ} strokeDashoffset={circ*(1-pct/100)} strokeLinecap="round" style={{ transition:"stroke-dashoffset 1.2s ease" }}/>
         </svg>
         <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
           <span style={{ fontSize:"1.4rem" }}>{tier.icon}</span>
@@ -205,18 +236,10 @@ function Lightbox({ photo, onClose }) {
 
 function FloatingNails() {
   const nails = ["💅","✨","💎","🌸","👑","💚","🌿"];
-  return (
-    <>
-      {nails.map((n,i) => (
-        <div key={i} className="floating-nail" style={{ left:`${8+i*13}%`, top:`${15+i*10}%`, animationDelay:`${i*0.6}s`, animationDuration:`${3+i*0.4}s`, fontSize:`${0.9+i*0.05}rem` }}>{n}</div>
-      ))}
-    </>
-  );
+  return <>{nails.map((n,i) => <div key={i} className="floating-nail" style={{ left:`${8+i*13}%`, top:`${15+i*10}%`, animationDelay:`${i*0.6}s`, animationDuration:`${3+i*0.4}s` }}>{n}</div>)}</>;
 }
 
-function Page({ children }) {
-  return <div className="page-wrap">{children}</div>;
-}
+function Page({ children }) { return <div className="page-wrap">{children}</div>; }
 
 function AboutPage({ onNav }) {
   return (
@@ -244,12 +267,7 @@ function AboutPage({ onNav }) {
               </p>
               <div style={{ background:"linear-gradient(135deg,#1B3A2D,#2A5240)", borderRadius:16, padding:24, marginBottom:24, color:"white" }}>
                 <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", color:"#C8A96E", marginBottom:14 }}>Good to Know</div>
-                {[
-                  ["📅","Appointment Only","No walk-ins. Book through Calendly or contact Lizzie directly."],
-                  ["🕐","Out-of-Hours Available","Need an appointment outside normal hours? Just ask — a small additional fee may apply."],
-                  ["💬","Questions?","Contact Lizzie personally for anything about booking or services."],
-                  ["🎨","Handpainted Only","Every design is made by hand. No stamps, stickers, or stencils. Ever."],
-                ].map(([icon,title,body])=>(
+                {[["📅","Appointment Only","No walk-ins. Book through Calendly or contact Lizzie directly."],["🕐","Out-of-Hours Available","Need an appointment outside normal hours? Just ask — a small additional fee may apply."],["💬","Questions?","Contact Lizzie personally for anything about booking or services."],["🎨","Handpainted Only","Every design is made by hand. No stamps, stickers, or stencils. Ever."]].map(([icon,title,body]) => (
                   <div key={title} style={{ display:"flex", gap:14, marginBottom:16 }}>
                     <span style={{ fontSize:"1.1rem", minWidth:24 }}>{icon}</span>
                     <div>
@@ -261,13 +279,13 @@ function AboutPage({ onNav }) {
               </div>
               <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
                 <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" className="btn-gold" style={{ padding:"13px 28px" }}>Book an Appointment</a>
-                <button className="btn-outline" onClick={()=>onNav("services")} style={{ padding:"13px 28px" }}>View Services</button>
+                <button className="btn-outline" onClick={() => onNav("services")} style={{ padding:"13px 28px" }}>View Services</button>
               </div>
             </div>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop:48 }}>
-            {[["🌿","Homemade Cuticle Oil","Lizzie's signature cuticle oil — a client favorite."],["🎨","Handpainted Art","Every design crafted by hand, made just for you."],["💚","Personal Service","Private studio, one-on-one attention, every time."]].map(([icon,title,body])=>(
-              <div key={title} className="card-hover" style={{ background:"white", borderRadius:16, padding:24, border:"1px solid #D9E8D9", textAlign:"center" }}>
+            {[["🌿","Homemade Cuticle Oil","Lizzie's signature cuticle oil — a client favorite."],["🎨","Handpainted Art","Every design crafted by hand, made just for you."],["💚","Personal Service","Private studio, one-on-one attention, every time."]].map(([icon,title,body]) => (
+              <div key={title} className="about-value-card">
                 <div style={{ fontSize:"2rem", marginBottom:12 }}>{icon}</div>
                 <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.1rem", color:"#0F1F18", marginBottom:8 }}>{title}</div>
                 <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"#4A6358", lineHeight:1.6 }}>{body}</div>
@@ -291,18 +309,19 @@ function ServicesPage({ onNav }) {
           <h2 className="section-title">Services & Pricing</h2>
           <p className="section-sub" style={{ marginBottom:40, maxWidth:520 }}>Every service is performed with premium products, sanitary tools, and an eye for detail. All nail art is handpainted — no stencils or stamps.</p>
           <div style={{ display:"inline-flex", gap:8, flexWrap:"wrap", marginBottom:36, background:"#D9E8D9", padding:6, borderRadius:40 }}>
-            {SERVICES.map(s => <button key={s.cat} className={`tab-btn ${tab===s.cat?"active":""}`} onClick={()=>setTab(s.cat)}>{s.cat}</button>)}
+            {SERVICES.map(s => <button key={s.cat} className={`tab-btn ${tab===s.cat?"active":""}`} onClick={() => setTab(s.cat)}>{s.cat}</button>)}
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:1 }}>
-            {cat.items.map((item,i)=>(
-              <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"22px 28px", background:"white", borderRadius:i===0?"14px 14px 0 0":i===cat.items.length-1?"0 0 14px 14px":0, borderBottom:i<cat.items.length-1?"1px solid #D9E8D9":"none", transition:"background 0.2s" }}
-                onMouseEnter={e=>e.currentTarget.style.background="#D9E8D9"}
-                onMouseLeave={e=>e.currentTarget.style.background="white"}>
+            {cat.items.map((item,i) => (
+              <div key={i} className="service-row" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"22px 28px", background:"white", borderRadius:i===0?"14px 14px 0 0":i===cat.items.length-1?"0 0 14px 14px":0, borderBottom:i<cat.items.length-1?"1px solid #D9E8D9":"none", cursor:"pointer" }} onClick={() => onNav("book")}>
                 <div>
                   <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.15rem", color:"#0F1F18", marginBottom:4 }}>{item.name}</div>
                   <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"#4A6358" }}>{item.desc} · {item.time}</div>
                 </div>
-                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.3rem", fontWeight:600, color:"#1B3A2D" }}>${item.price}</div>
+                <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.3rem", fontWeight:600, color:"#1B3A2D" }}>${item.price}</div>
+                  <span className="book-hint">Book this →</span>
+                </div>
               </div>
             ))}
           </div>
@@ -322,16 +341,16 @@ function GalleryPage() {
   const [lightbox, setLightbox] = useState(null);
   return (
     <Page>
-      {lightbox && <Lightbox photo={lightbox} onClose={()=>setLightbox(null)}/>}
+      {lightbox && <Lightbox photo={lightbox} onClose={() => setLightbox(null)} />}
       <div style={{ minHeight:"100vh", background:"#F4F7F4", padding:"80px 40px" }}>
         <div style={{ maxWidth:1000, margin:"0 auto" }}>
           <div className="section-label">Portfolio</div>
           <h2 className="section-title">The Work</h2>
           <p className="section-sub" style={{ marginBottom:48, maxWidth:480 }}>Real sets, real clients. Every design handpainted by Lizzie. Tap any photo to view full size.</p>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
-            {GALLERY_PHOTOS.map((photo,i)=>(
-              <div key={i} className="gallery-cell" onClick={()=>setLightbox(photo)}>
-                <img src={`/gallery/${photo.file}`} alt={photo.label} onError={e=>{e.target.style.background="#D9E8D9";e.target.style.minHeight="200px";}}/>
+            {GALLERY_PHOTOS.map((photo,i) => (
+              <div key={i} className="gallery-cell" onClick={() => setLightbox(photo)}>
+                <img src={`/gallery/${photo.file}`} alt={photo.label} onError={e=>{ e.target.style.background="#D9E8D9"; e.target.style.minHeight="200px"; }} />
                 <div className="gallery-overlay">
                   <div>
                     <div style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1rem" }}>{photo.label}</div>
@@ -397,18 +416,15 @@ function PressOnPage() {
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(false);
   const fileRef = useRef(null);
-
   const artPrice = ART_TIERS[artTier].price;
   const total = BASE + artPrice;
   const setSize = (hand,finger,size) => setSizes(p=>({...p,[hand]:{...p[hand],[finger]:size}}));
   const allSized = () => FINGERS.every(f=>sizes.L[f]&&sizes.R[f]);
-
   const s1ok = shape && length;
   const s2ok = allSized();
   const s3ok = design.trim().length > 0;
   const s4ok = address.name&&address.street&&address.city&&address.state&&address.zip&&address.email;
   const s5ok = card.name&&card.number.length>=15&&card.exp&&card.cvc.length>=3;
-
   const reset = () => { setDone(false);setStep(1);setShape("");setLength("");setArtTier(0);setSizes({L:{},R:{}});setDesign("");setInspoFile(null);setAddress({name:"",street:"",city:"",state:"",zip:"",email:"",phone:""});setCard({name:"",number:"",exp:"",cvc:""}); };
 
   if (done) return (
@@ -444,12 +460,12 @@ function PressOnPage() {
           <h2 className="section-title">Custom Press-On Sets</h2>
           <p className="section-sub" style={{ marginBottom:16, maxWidth:540 }}>Can't make it to Ashley? Order a custom handmade set from Lizzie, shipped straight to your door in 7-10 business days.</p>
           <div style={{ display:"flex", gap:10, marginBottom:40, flexWrap:"wrap" }}>
-            {[["💅","Custom handmade"],["📦","Ships anywhere in US"],["🎨","Your design, your sizes"],["⏱️","7-10 business days"],["🔒","Secure card on file"]].map(([icon,text])=>(
+            {[["💅","Custom handmade"],["📦","Ships anywhere in US"],["🎨","Your design, your sizes"],["⏱️","7-10 business days"],["🔒","Secure card on file"]].map(([icon,text]) => (
               <div key={text} style={{ background:"white", borderRadius:20, padding:"7px 15px", fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:"#1B3A2D", fontWeight:500, border:"1px solid #D9E8D9" }}>{icon} {text}</div>
             ))}
           </div>
           <div style={{ display:"flex", gap:8, marginBottom:36 }}>
-            {["Style","Sizing","Design","Shipping","Payment"].map((s,i)=>(
+            {["Style","Sizing","Design","Shipping","Payment"].map((s,i) => (
               <div key={s} style={{ flex:1 }}>
                 <div style={{ height:3, borderRadius:2, background:i+1<=step?"#1B3A2D":"#D9E8D9", transition:"background 0.4s", marginBottom:6 }}/>
                 <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.6rem", color:i+1===step?"#1B3A2D":"#4A6358", fontWeight:i+1===step?600:400, letterSpacing:"0.1em", textTransform:"uppercase" }}>{s}</div>
@@ -463,15 +479,11 @@ function PressOnPage() {
                   <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.5rem", color:"#0F1F18", marginBottom:24 }}>Choose Your Style</h3>
                   <div style={{ marginBottom:28 }}>
                     <label>Shape</label>
-                    <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginTop:8 }}>
-                      {SHAPES.map(s=><button key={s} className={`size-btn ${shape===s?"active":""}`} onClick={()=>setShape(s)}>{s}</button>)}
-                    </div>
+                    <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginTop:8 }}>{SHAPES.map(s=><button key={s} className={`size-btn ${shape===s?"active":""}`} onClick={()=>setShape(s)}>{s}</button>)}</div>
                   </div>
                   <div style={{ marginBottom:32 }}>
                     <label>Length</label>
-                    <div style={{ display:"flex", gap:10, marginTop:8 }}>
-                      {LENGTHS.map(l=><button key={l} className={`size-btn ${length===l?"active":""}`} onClick={()=>setLength(l)}>{l}</button>)}
-                    </div>
+                    <div style={{ display:"flex", gap:10, marginTop:8 }}>{LENGTHS.map(l=><button key={l} className={`size-btn ${length===l?"active":""}`} onClick={()=>setLength(l)}>{l}</button>)}</div>
                   </div>
                   <div style={{ marginBottom:32 }}>
                     <label>Nail Art Add-On</label>
@@ -498,9 +510,7 @@ function PressOnPage() {
                       {FINGERS.map(finger=>(
                         <div key={finger} className="finger-row">
                           <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", color:"#0F1F18" }}>{finger}</div>
-                          <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
-                            {SIZES.map(size=><button key={size} className={`size-btn ${sizes[hand][finger]===size?"active":""}`} style={{ padding:"4px 9px", fontSize:"0.7rem" }} onClick={()=>setSize(hand,finger,size)}>{size}</button>)}
-                          </div>
+                          <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>{SIZES.map(size=><button key={size} className={`size-btn ${sizes[hand][finger]===size?"active":""}`} style={{ padding:"4px 9px", fontSize:"0.7rem" }} onClick={()=>setSize(hand,finger,size)}>{size}</button>)}</div>
                         </div>
                       ))}
                     </div>
@@ -514,14 +524,14 @@ function PressOnPage() {
               {step===3 && (
                 <div style={{ background:"white", borderRadius:16, padding:32, boxShadow:"0 4px 24px rgba(27,58,45,0.06)", animation:"pageIn 0.35s ease" }}>
                   <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.5rem", color:"#0F1F18", marginBottom:8 }}>Your Design</h3>
-                  <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.8rem", color:"#4A6358", marginBottom:24, lineHeight:1.6 }}>Tell Lizzie your vision. The more detail the better. You can also upload an inspo photo.</p>
+                  <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.8rem", color:"#4A6358", marginBottom:24, lineHeight:1.6 }}>Tell Lizzie your vision. The more detail the better — colors, vibe, inspo. You can also upload a photo.</p>
                   <div style={{ marginBottom:20 }}>
                     <label>Colors & Vibe *</label>
-                    <textarea rows={4} placeholder="e.g. Nude pink base with gold chrome on ring fingers, white flower detail on index nails. Elegant and clean..." value={design} onChange={e=>setDesign(e.target.value)}/>
+                    <textarea rows={4} placeholder="e.g. Nude pink base with gold chrome on ring fingers, white flower detail on index nails. Elegant and clean..." value={design} onChange={e=>setDesign(e.target.value)} />
                   </div>
                   <div style={{ marginBottom:24 }}>
                     <label>Inspo Photo (optional)</label>
-                    <input type="file" ref={fileRef} accept="image/*" style={{ display:"none" }} onChange={e=>setInspoFile(e.target.files[0])}/>
+                    <input type="file" ref={fileRef} accept="image/*" style={{ display:"none" }} onChange={e=>setInspoFile(e.target.files[0])} />
                     <div className="upload-area" onClick={()=>fileRef.current.click()}>
                       {inspoFile ? (
                         <div><div style={{ fontSize:"2rem", marginBottom:8 }}>🖼</div><div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", color:"#1B3A2D", fontWeight:500 }}>{inspoFile.name}</div><div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:"#4A6358", marginTop:4 }}>Tap to change</div></div>
@@ -532,7 +542,7 @@ function PressOnPage() {
                   </div>
                   <div style={{ background:"#D9E8D9", borderRadius:12, padding:16, marginBottom:24 }}>
                     <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:"#1B3A2D", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6 }}>💡 Tip</div>
-                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"#4A6358", lineHeight:1.6 }}>You can also email inspo to <strong>eranailss@outlook.com</strong> after ordering — just include your name.</div>
+                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"#4A6358", lineHeight:1.6 }}>You can also email inspo to <strong>eranailss@outlook.com</strong> after ordering — just include your name so Lizzie can match it up.</div>
                   </div>
                   <div style={{ display:"flex", gap:12 }}>
                     <button className="btn-outline" style={{ flex:1 }} onClick={()=>setStep(2)}>← Back</button>
@@ -616,44 +626,86 @@ function PressOnPage() {
   );
 }
 
-function LoyaltyPage() {
-  const [pts, setPts] = useState(120);
+function LoyaltyPage({ onNav }) {
+  const [member, setMember] = useState(null);
+  const [form, setForm] = useState({ name:"", email:"", phone:"" });
+  const [formError, setFormError] = useState("");
+  const [pts, setPts] = useState(0);
   const [redeemed, setRedeemed] = useState([]);
   const [toast, setToast] = useState(null);
   const tier = getTier(pts);
   const tierIdx = TIERS.indexOf(tier);
   const nextTier = TIERS[tierIdx+1];
-
   const showToast = (msg) => { setToast(msg); setTimeout(()=>setToast(null),3000); };
+  const handleJoin = () => {
+    if (!form.name || !form.email || !form.phone) { setFormError("Please fill in all fields to join."); return; }
+    setMember(form); showToast(`Welcome to your new ERA, ${form.name}! 🌱`);
+  };
   const redeem = (r) => {
     if (pts < r.pts || redeemed.includes(r.label)) return;
     setPts(p=>p-r.pts); setRedeemed(prev=>[...prev,r.label]); showToast(`${r.icon} Redeemed: ${r.label}!`);
   };
+
+  if (!member) return (
+    <Page>
+      <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#0A1A0F,#1B3A2D)", display:"flex", alignItems:"center", justifyContent:"center", padding:40 }}>
+        <div style={{ maxWidth:520, width:"100%", animation:"fadeUp 0.5s ease" }}>
+          <div style={{ textAlign:"center", marginBottom:40 }}>
+            <div style={{ fontSize:"3rem", marginBottom:16, animation:"float 3s ease-in-out infinite" }}>👑</div>
+            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.9rem", color:"rgba(200,169,110,0.5)", letterSpacing:"0.2em", marginBottom:12 }}>which era are you in?</div>
+            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(2.2rem,6vw,3.2rem)", fontWeight:300, color:"#F4F7F4", lineHeight:1.05, marginBottom:12 }}>Welcome to your<br/>new ERA.</h2>
+            <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.88rem", color:"rgba(255,255,255,0.55)", lineHeight:1.7 }}>Join the ERA loyalty program — it's free. Earn points every time you book, unlock real rewards, and climb the tiers as your loyalty grows.</p>
+          </div>
+          <div style={{ display:"flex", gap:8, marginBottom:32, overflowX:"auto", paddingBottom:4 }}>
+            {TIERS.map(t => (
+              <div key={t.name} style={{ minWidth:110, background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"14px 12px", textAlign:"center", border:"1px solid rgba(255,255,255,0.08)", flex:1 }}>
+                <div style={{ fontSize:"1.3rem", marginBottom:6 }}>{t.icon}</div>
+                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"0.82rem", color:"white", marginBottom:3 }}>{t.name}</div>
+                <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.6rem", color:"rgba(200,169,110,0.7)", lineHeight:1.4 }}>{t.perk}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:20, padding:32, border:"1px solid rgba(200,169,110,0.15)" }}>
+            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#C8A96E", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:20 }}>Create Your Member Profile</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:20 }}>
+              <div><label style={{ color:"rgba(255,255,255,0.5)" }}>Full Name *</label><input placeholder="Your name" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={{ background:"rgba(255,255,255,0.08)", borderColor:"rgba(255,255,255,0.15)", color:"white" }}/></div>
+              <div><label style={{ color:"rgba(255,255,255,0.5)" }}>Email *</label><input placeholder="you@email.com" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} style={{ background:"rgba(255,255,255,0.08)", borderColor:"rgba(255,255,255,0.15)", color:"white" }}/></div>
+              <div><label style={{ color:"rgba(255,255,255,0.5)" }}>Phone *</label><input placeholder="(555) 000-0000" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} style={{ background:"rgba(255,255,255,0.08)", borderColor:"rgba(255,255,255,0.15)", color:"white" }}/></div>
+            </div>
+            {formError && <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:"#F87171", marginBottom:14 }}>{formError}</div>}
+            <button className="btn-gold" style={{ width:"100%", padding:"16px", fontSize:"0.85rem", letterSpacing:"0.2em" }} onClick={handleJoin}>Join ERA — It's Free ✦</button>
+            <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.3)", textAlign:"center", marginTop:14, lineHeight:1.6 }}>Free to join. Points earned through bookings and activity. Perks unlock as you level up.</p>
+          </div>
+        </div>
+      </div>
+    </Page>
+  );
 
   return (
     <Page>
       {toast && <div style={{ position:"fixed", top:20, left:"50%", transform:"translateX(-50%)", background:"#1B3A2D", color:"white", padding:"12px 24px", borderRadius:30, fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", zIndex:9999, animation:"fadeUp 0.3s ease", boxShadow:"0 8px 24px rgba(0,0,0,0.2)", whiteSpace:"nowrap" }}>{toast}</div>}
       <div style={{ background:"linear-gradient(160deg,#0A1A0F,#1B3A2D)", padding:"80px 40px 48px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
-          <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#C8A96E", fontWeight:600, letterSpacing:"0.28em", textTransform:"uppercase", marginBottom:8 }}>Loyalty Program</div>
-          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.9rem", color:"rgba(255,255,255,0.35)", marginBottom:16, letterSpacing:"0.12em" }}>which era are you in?</div>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(2rem,5vw,3rem)", fontWeight:300, color:"#F4F7F4", marginBottom:32 }}>ERA Loyalty</h2>
+          <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#C8A96E", fontWeight:600, letterSpacing:"0.28em", textTransform:"uppercase", marginBottom:8 }}>ERA Member</div>
+          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.9rem", color:"rgba(255,255,255,0.4)", marginBottom:16, letterSpacing:"0.12em" }}>which era are you in?</div>
+          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(2rem,5vw,3rem)", fontWeight:300, color:"#F4F7F4", marginBottom:4 }}>Welcome, {member.name.split(" ")[0]}.</h2>
+          <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", color:"rgba(255,255,255,0.4)", marginBottom:32 }}>{member.email}</p>
           <div style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:40, alignItems:"center", background:"rgba(255,255,255,0.05)", borderRadius:20, padding:32, border:"1px solid rgba(200,169,110,0.2)", marginBottom:32 }}>
-            <TierRing pts={pts}/>
+            <TierRing pts={pts} />
             <div>
               <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.8rem", color:"#F4F7F4", marginBottom:4 }}>{tier.name}</div>
-              <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", color:"rgba(255,255,255,0.55)", marginBottom:12 }}>{tier.desc}</div>
+              <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", color:"rgba(255,255,255,0.6)", marginBottom:12 }}>{tier.desc}</div>
               <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"#C8A96E", fontWeight:500, marginBottom:16 }}>✦ {tier.perk}</div>
               {nextTier && (
                 <div>
                   <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-                    <span style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.35)" }}>{tier.name}</span>
-                    <span style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.35)" }}>{nextTier.name}</span>
+                    <span style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.4)" }}>{tier.name}</span>
+                    <span style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.4)" }}>{nextTier.name}</span>
                   </div>
                   <div style={{ height:5, background:"rgba(255,255,255,0.1)", borderRadius:3, overflow:"hidden" }}>
                     <div style={{ height:"100%", background:"linear-gradient(90deg,#C8A96E,#E8D5A8)", width:`${Math.min(100,((pts-tier.min)/(nextTier.min-tier.min))*100)}%`, borderRadius:3, transition:"width 1s ease" }}/>
                   </div>
-                  <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"rgba(255,255,255,0.3)", marginTop:6 }}>{nextTier.min-pts} pts to unlock {nextTier.name} {nextTier.icon}</div>
+                  <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"rgba(255,255,255,0.35)", marginTop:6 }}>{nextTier.min-pts} pts to unlock {nextTier.name} {nextTier.icon}</div>
                 </div>
               )}
             </div>
@@ -665,8 +717,8 @@ function LoyaltyPage() {
           <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#4A6358", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>All Tiers</div>
           <div style={{ background:"linear-gradient(160deg,#0A1A0F,#1B3A2D)", borderRadius:20, padding:28, marginBottom:40 }}>
             <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:4 }}>
-              {TIERS.map((t)=>{
-                const isCurrent=tier===t; const unlocked=pts>=t.min;
+              {TIERS.map((t) => {
+                const isCurrent=tier===t, unlocked=pts>=t.min;
                 return (
                   <div key={t.name} className="tier-card" style={{ minWidth:160, flex:1, borderColor:isCurrent?"#C8A96E":unlocked?"rgba(200,169,110,0.3)":"rgba(255,255,255,0.07)", background:isCurrent?"rgba(200,169,110,0.15)":unlocked?"rgba(255,255,255,0.05)":"rgba(255,255,255,0.02)" }}>
                     <div style={{ fontSize:"1.6rem", marginBottom:8 }}>{t.icon}</div>
@@ -681,8 +733,8 @@ function LoyaltyPage() {
           </div>
           <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#4A6358", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>Redeem Points</div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:40 }}>
-            {REWARDS.map(r=>{
-              const can=pts>=r.pts&&!redeemed.includes(r.label); const used=redeemed.includes(r.label);
+            {REWARDS.map(r => {
+              const can=pts>=r.pts&&!redeemed.includes(r.label), used=redeemed.includes(r.label);
               return (
                 <div key={r.label} className={`reward-card ${can?"redeemable":""}`} onClick={()=>can&&redeem(r)} style={{ opacity:used?0.5:1, cursor:can?"pointer":"not-allowed" }}>
                   <div style={{ fontSize:"1.8rem", marginBottom:10 }}>{r.icon}</div>
@@ -696,13 +748,16 @@ function LoyaltyPage() {
               );
             })}
           </div>
-          <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#4A6358", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>How to Earn</div>
+          <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#4A6358", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>How to Earn Points</div>
           <div style={{ background:"white", borderRadius:16, overflow:"hidden", border:"1px solid #D9E8D9" }}>
-            {[["📅","Book a service","+10 pts"],["⭐","Leave a review","+20 pts"],["👭","Refer a friend","+50 pts"],["🎂","Birthday bonus","+30 pts"],["📸","Share your set on social","+15 pts"],["💅","Order a press-on set","+10 pts"]].map(([icon,action,p],i,arr)=>(
-              <div key={action} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 24px", borderBottom:i<arr.length-1?"1px solid #D9E8D9":"none" }}>
+            {[["📅","Book a service","+10 pts","book"],["⭐","Leave a review","+20 pts",null],["👭","Refer a friend","+50 pts",null],["🎂","Birthday bonus","+30 pts",null],["📸","Share your set on social","+15 pts",null],["💅","Order a press-on set","+10 pts","pressons"]].map(([icon,action,p,dest],i,arr) => (
+              <div key={action} onClick={()=>dest&&onNav(dest)} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 24px", borderBottom:i<arr.length-1?"1px solid #D9E8D9":"none", cursor:dest?"pointer":"default", transition:"background 0.2s" }}
+                onMouseEnter={e=>dest&&(e.currentTarget.style.background="#D9E8D9")}
+                onMouseLeave={e=>dest&&(e.currentTarget.style.background="white")}>
                 <div style={{ display:"flex", gap:14, alignItems:"center" }}>
                   <span style={{ fontSize:"1.1rem" }}>{icon}</span>
                   <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.84rem", color:"#0F1F18" }}>{action}</div>
+                  {dest && <span style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:"#C8A96E" }}>→</span>}
                 </div>
                 <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", fontWeight:600, color:"#1B3A2D", background:"#D9E8D9", padding:"4px 12px", borderRadius:20 }}>{p}</div>
               </div>
@@ -724,19 +779,19 @@ function ReviewsPage() {
           <div style={{ display:"flex", alignItems:"center", gap:32, marginBottom:48 }}>
             <div>
               <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"5rem", fontWeight:300, color:"#1B3A2D", lineHeight:1 }}>5.0</div>
-              <Stars n={5}/>
+              <Stars n={5} />
               <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.74rem", color:"#4A6358", marginTop:4 }}>all 5-star reviews</div>
             </div>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:20 }}>
-            {REVIEWS.map((r,i)=>(
-              <div key={i} className="card-hover" style={{ background:"white", borderRadius:16, padding:28, boxShadow:"0 2px 20px rgba(27,58,45,0.05)", animation:`fadeUp 0.4s ease ${i*0.08}s both` }}>
+            {REVIEWS.map((r,i) => (
+              <div key={i} className="review-card" style={{ animation:`fadeUp 0.4s ease ${i*0.08}s both` }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
                   <div>
                     <div style={{ fontFamily:"'Jost',sans-serif", fontWeight:600, color:"#0F1F18" }}>{r.name}</div>
                     <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"#4A6358" }}>{r.service}</div>
                   </div>
-                  <Stars n={r.rating}/>
+                  <Stars n={r.rating} />
                 </div>
                 <p style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.05rem", color:"#0F1F18", lineHeight:1.65, fontStyle:"italic" }}>"{r.text}"</p>
               </div>
@@ -762,14 +817,14 @@ function PolicyPage() {
           <h2 className="section-title">Cancellation Policy</h2>
           <p className="section-sub" style={{ marginBottom:48 }}>We respect your time and ask the same in return.</p>
           {[
-            { icon:"⏰", title:"48-Hour Cancellation", body:"Cancellations made at least 48 hours before are fully refunded with no fee. We're happy to reschedule at no charge with proper notice." },
-            { icon:"💳", title:"Card Required at Booking", body:"A valid card on file is required to secure all appointments. This allows us to enforce the cancellation policy fairly and protect Lizzie's time." },
+            { icon:"⏰", title:"48-Hour Cancellation", body:"Cancellations made at least 48 hours before your appointment are fully refunded with no fee. We're happy to reschedule at no charge with proper notice." },
+            { icon:"💳", title:"Card Required at Booking", body:"A valid card is required on file to secure all appointments. This allows us to enforce the cancellation policy fairly and protect Lizzie's time." },
             { icon:"⚠️", title:"Late Cancellations (Under 48 Hours)", body:"Cancellations within 48 hours are subject to a 50% service fee charged to the card on file." },
-            { icon:"❌", title:"No-Shows", body:"Clients who don't show up without notice will be charged 100% of the service to the card on file. Repeated no-shows may require prepayment." },
+            { icon:"❌", title:"No-Shows", body:"Clients who don't show up without notice will be charged 100% of the service to the card on file. Repeated no-shows may require prepayment for future bookings." },
             { icon:"🔁", title:"Rescheduling", body:"Happy to reschedule at no charge if done 48+ hours in advance. Same-day reschedules are treated as late cancellations." },
-            { icon:"📱", title:"How to Cancel", body:"Cancel through your Calendly confirmation email or by calling/texting Lizzie at 260-350-9001. Social media DMs not guaranteed." },
+            { icon:"📱", title:"How to Cancel", body:"Cancel through your Calendly confirmation email or by calling/texting Lizzie directly at 260-350-9001. Social media DMs are not guaranteed to be seen in time." },
             { icon:"✦", title:"First-Time Clients", body:"All first-time bookings require a valid phone number and card on file for confirmation." },
-          ].map((p,i)=>(
+          ].map((p,i) => (
             <div key={i} className="policy-item">
               <div style={{ fontSize:"1.4rem", minWidth:32 }}>{p.icon}</div>
               <div>
@@ -795,30 +850,30 @@ function HomePage({ onNav }) {
   return (
     <div>
       <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#1B3A2D 0%,#0A1A0F 55%,#041008 100%)", display:"flex", flexDirection:"column", position:"relative", overflow:"hidden" }}>
-        <FloatingNails/>
-        {[[500,500,-120,-100,"rgba(200,169,110,0.07)",90],[350,350,40,-80,"rgba(200,169,110,0.05)",70]].map(([w,h,t,l,bg,bl],i)=>(
+        <FloatingNails />
+        {[[500,500,-120,-100,"rgba(200,169,110,0.07)",90],[350,350,40,-80,"rgba(200,169,110,0.05)",70],[180,180,"40%","45%","rgba(184,212,184,0.04)",45]].map(([w,h,t,l,bg,bl],i) => (
           <div key={i} style={{ position:"absolute", width:w, height:h, top:t, left:l, background:bg, borderRadius:"50%", filter:`blur(${bl}px)`, pointerEvents:"none" }}/>
         ))}
         <nav style={{ padding:"24px 40px", display:"flex", justifyContent:"space-between", alignItems:"center", position:"relative", zIndex:10 }}>
-          <Logo/>
+          <Logo />
           <div style={{ display:"flex", gap:24, alignItems:"center", flexWrap:"wrap" }}>
-            {NAV_ITEMS.map(s=><button key={s} className="nav-link" onClick={()=>onNav(s.toLowerCase().replace(/[^a-z]/g,""))}>{s}</button>)}
+            {NAV_ITEMS.map(s => <button key={s} className="nav-link" onClick={() => onNav(s.toLowerCase().replace(/[^a-z]/g,""))}>{s}</button>)}
             <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" className="btn-gold" style={{ padding:"10px 22px", fontSize:"0.78rem" }}>Book Now</a>
           </div>
         </nav>
         <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"40px 20px 80px", position:"relative", zIndex:1 }}>
-          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.9rem", color:"rgba(200,169,110,0.45)", letterSpacing:"0.2em", marginBottom:20, animation:"fadeIn 1.2s ease" }}>which era are you in?</div>
+          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.9rem", color:"rgba(200,169,110,0.5)", letterSpacing:"0.2em", marginBottom:20, animation:"fadeIn 1.2s ease" }}>which era are you in?</div>
           <div style={{ animation:"fadeUp 0.7s ease 0.1s both" }}>
             <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:200, fontSize:"clamp(4rem,12vw,8rem)", lineHeight:0.88, color:"#F4F7F4", letterSpacing:"-0.02em" }}>ERA</h1>
             <div className="glitter-text" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"clamp(1.6rem,4.5vw,2.8rem)", letterSpacing:"0.22em", marginBottom:8 }}>NAILS</div>
-            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.5rem)", color:"#B8D4B8", opacity:0.7, marginBottom:40 }}>by Lizzie</div>
+            <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.5rem)", color:"#B8D4B8", opacity:0.75, marginBottom:40 }}>by Lizzie</div>
           </div>
           <div style={{ display:"flex", gap:16, flexWrap:"wrap", justifyContent:"center", animation:"fadeUp 0.7s ease 0.3s both" }}>
             <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" className="btn-gold" style={{ padding:"16px 44px", fontSize:"0.82rem" }}>Book an Appointment</a>
-            <button className="btn-outline" style={{ borderColor:"#B8D4B8", color:"#B8D4B8", fontSize:"0.82rem", padding:"16px 44px" }} onClick={()=>onNav("pressons")}>Order Press-Ons</button>
+            <button className="btn-outline" style={{ borderColor:"#B8D4B8", color:"#B8D4B8", fontSize:"0.82rem", padding:"16px 44px" }} onClick={() => onNav("pressons")}>Order Press-Ons</button>
           </div>
           <div style={{ display:"flex", gap:52, marginTop:72, flexWrap:"wrap", justifyContent:"center", animation:"fadeUp 0.7s ease 0.5s both" }}>
-            {[["5★","All 5-Star Reviews"],["🖌️","Handpainted Art Only"],["💎","Builder Gel Specialist"]].map(([num,label])=>(
+            {[["5★","All 5-Star Reviews"],["🖌️","Handpainted Art Only"],["💎","Builder Gel Specialist"]].map(([num,label]) => (
               <div key={label} style={{ textAlign:"center" }}>
                 <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"2rem", fontWeight:300, color:"#C8A96E" }}>{num}</div>
                 <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", letterSpacing:"0.18em", textTransform:"uppercase", color:"#B8D4B8", opacity:0.6, marginTop:4 }}>{label}</div>
@@ -829,7 +884,7 @@ function HomePage({ onNav }) {
         <div style={{ position:"absolute", bottom:28, left:"50%", transform:"translateX(-50%)", animation:"float 2.5s ease-in-out infinite", opacity:0.35, color:"#C8A96E", fontSize:"1.4rem" }}>⌄</div>
       </div>
       <div style={{ background:"#C8A96E", padding:"18px 40px", display:"flex", justifyContent:"center", gap:56, flexWrap:"wrap" }}>
-        {[["📞 Call or Text","260-350-9001"],["📧 Email","eranailss@outlook.com"],["📍 Ashley, Indiana","By appointment only"]].map(([t,s])=>(
+        {[["📞 Call or Text","260-350-9001"],["📧 Email","eranailss@outlook.com"],["📍 Ashley, Indiana","By appointment only"]].map(([t,s]) => (
           <div key={t} style={{ textAlign:"center" }}>
             <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.12em", textTransform:"uppercase", color:"#1B3A2D" }}>{t}</div>
             <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.8rem", color:"#0A1A0F", marginTop:2 }}>{s}</div>
@@ -842,37 +897,51 @@ function HomePage({ onNav }) {
 
 export default function EraApp() {
   const [section, setSection] = useState("home");
+  const [transitioning, setTransitioning] = useState(false);
   const topRef = useRef(null);
-  const navigate = useCallback((s) => { setSection(s); setTimeout(()=>topRef.current?.scrollIntoView({behavior:"smooth"}),50); },[]);
-  const key = (s) => s.toLowerCase().replace(/[^a-z]/g,"");
+
+  const navigate = useCallback((s) => {
+    if (s === section) return;
+    setTransitioning(true);
+    setTimeout(() => {
+      setSection(s);
+      setTransitioning(false);
+      setTimeout(() => topRef.current?.scrollIntoView({ behavior:"smooth" }), 50);
+    }, 480);
+  }, [section]);
+
+  const sectionKey = (s) => s.toLowerCase().replace(/[^a-z]/g,"");
 
   return (
     <div style={{ minHeight:"100vh", background:"#F4F7F4" }}>
       <style>{css}</style>
-      <div ref={topRef}/>
-      {section!=="home" && (
+      <NailTransition active={transitioning} />
+      <div ref={topRef} />
+      {section !== "home" && (
         <nav style={{ position:"sticky", top:0, zIndex:100, background:"#1B3A2D", padding:"14px 40px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 2px 24px rgba(10,26,15,0.3)" }}>
-          <div style={{ cursor:"pointer" }} onClick={()=>navigate("home")}><Logo size={28}/></div>
+          <div style={{ cursor:"pointer" }} onClick={() => navigate("home")}><Logo size={28} /></div>
           <div style={{ display:"flex", gap:22, alignItems:"center", flexWrap:"wrap" }}>
-            {NAV_ITEMS.map(s=><button key={s} className={`nav-link ${section===key(s)?"active":""}`} onClick={()=>navigate(key(s))} style={{ fontSize:"0.76rem" }}>{s}</button>)}
+            {NAV_ITEMS.map(s => (
+              <button key={s} className={`nav-link ${section===sectionKey(s)?"active":""}`} onClick={() => navigate(sectionKey(s))} style={{ fontSize:"0.76rem" }}>{s}</button>
+            ))}
             <a href="https://calendly.com/eranailss" target="_blank" rel="noopener noreferrer" className="btn-gold" style={{ padding:"8px 18px", fontSize:"0.72rem" }}>Book</a>
           </div>
         </nav>
       )}
-      {section==="home"     && <HomePage onNav={navigate}/>}
-      {section==="about"    && <AboutPage onNav={navigate}/>}
-      {section==="services" && <ServicesPage onNav={navigate}/>}
-      {section==="gallery"  && <GalleryPage/>}
-      {section==="book"     && <BookPage/>}
-      {section==="pressons" && <PressOnPage/>}
-      {section==="loyalty"  && <LoyaltyPage/>}
-      {section==="reviews"  && <ReviewsPage/>}
-      {section==="policy"   && <PolicyPage/>}
+      {section==="home"     && <HomePage onNav={navigate} />}
+      {section==="about"    && <AboutPage onNav={navigate} />}
+      {section==="services" && <ServicesPage onNav={navigate} />}
+      {section==="gallery"  && <GalleryPage />}
+      {section==="book"     && <BookPage />}
+      {section==="pressons" && <PressOnPage />}
+      {section==="loyalty"  && <LoyaltyPage onNav={navigate} />}
+      {section==="reviews"  && <ReviewsPage />}
+      {section==="policy"   && <PolicyPage />}
       <footer style={{ background:"#0A1A0F", padding:"48px 40px 32px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:32, marginBottom:40 }}>
             <div>
-              <Logo size={32}/>
+              <Logo size={32} />
               <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"#4A6358", marginTop:14, maxWidth:210, lineHeight:1.75 }}>Luxury nail studio by Lizzie. Ashley, Indiana.</p>
               <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.82rem", color:"rgba(200,169,110,0.35)", marginTop:8, letterSpacing:"0.1em" }}>which era are you in?</div>
               <div style={{ marginTop:14 }}>
@@ -882,12 +951,14 @@ export default function EraApp() {
             </div>
             <div>
               <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", color:"#C8A96E", marginBottom:14 }}>Navigate</div>
-              {NAV_ITEMS.map(l=><div key={l} style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.8rem", color:"#4A6358", marginBottom:10, cursor:"pointer" }} onClick={()=>navigate(key(l))}>{l}</div>)}
+              {NAV_ITEMS.map(l => (
+                <div key={l} style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.8rem", color:"#4A6358", marginBottom:10, cursor:"pointer" }} onClick={() => navigate(sectionKey(l))}>{l}</div>
+              ))}
             </div>
           </div>
           <div style={{ borderTop:"1px solid rgba(255,255,255,0.05)", paddingTop:24, display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
-            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.18)" }}>© 2025 ERA Nails by Lizzie. All rights reserved.</div>
-            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.18)" }}>Ashley, Indiana ✦ By Appointment Only</div>
+            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.2)" }}>© 2025 ERA Nails by Lizzie. All rights reserved.</div>
+            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.2)" }}>Ashley, Indiana ✦ By Appointment Only</div>
           </div>
         </div>
       </footer>
