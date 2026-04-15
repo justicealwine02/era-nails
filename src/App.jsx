@@ -85,7 +85,50 @@ const ART_TIERS = [
 
 const NAV_ITEMS = ["About","Services","Gallery","Book","Press-Ons","Loyalty","Reviews","Policy"];
 
-// ─── CSS ──────────────────────────────────────────────────────────────────────
+// ─── Loyalty Storage Helpers ──────────────────────────────────────────────────
+const STORAGE_KEY = "era_loyalty_members";
+
+function getMembers() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+  catch { return []; }
+}
+
+function saveMembers(members) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(members)); }
+  catch {}
+}
+
+function getMemberByEmail(email) {
+  return getMembers().find(m => m.email.toLowerCase() === email.toLowerCase()) || null;
+}
+
+function addMember(name, email, phone) {
+  const members = getMembers();
+  const existing = members.find(m => m.email.toLowerCase() === email.toLowerCase());
+  if (existing) return existing;
+  const newMember = {
+    name, email, phone,
+    points: 5,
+    joined: new Date().toLocaleDateString(),
+    history: [{ action: "Joined ERA Loyalty", pts: 5, date: new Date().toLocaleDateString() }],
+  };
+  saveMembers([...members, newMember]);
+  return newMember;
+}
+
+function addPoints(email, pts, reason) {
+  const members = getMembers();
+  const idx = members.findIndex(m => m.email.toLowerCase() === email.toLowerCase());
+  if (idx === -1) return false;
+  members[idx].points = (members[idx].points || 0) + pts;
+  members[idx].history = [...(members[idx].history || []), {
+    action: reason, pts, date: new Date().toLocaleDateString()
+  }];
+  saveMembers(members);
+  return true;
+}
+
+
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -568,6 +611,9 @@ function PressOnPage() {
   const [card, setCard] = useState({name:"",number:"",exp:"",cvc:""});
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [pressOnPointsAwarded, setPressOnPointsAwarded] = useState(false);
   const fileRef = useRef(null);
 
   const artPrice = ART_TIERS[artTier].price;
@@ -581,7 +627,47 @@ function PressOnPage() {
   const s4ok = address.name&&address.street&&address.city&&address.state&&address.zip&&address.email;
   const s5ok = card.name&&card.number.length>=15&&card.exp&&card.cvc.length>=3;
 
-  const reset = () => { setDone(false);setStep(1);setShape("");setLength("");setArtTier(0);setSizes({L:{},R:{}});setDesign("");setInspoFile(null);setAddress({name:"",street:"",city:"",state:"",zip:"",email:"",phone:""});setCard({name:"",number:"",exp:"",cvc:""}); };
+  const submitOrder = async () => {
+    setSubmitting(true);
+    setSubmitError("");
+    const sizingSummary = ["L","R"].map(hand =>
+      `${hand==="L"?"Left":"Right"}: ${FINGERS.map(f=>`${f}=${sizes[hand][f]||"?"}`).join(", ")}`
+    ).join(" | ");
+    try {
+      const res = await fetch("https://formspree.io/f/xvzdgwee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          subject: `💅 New Press-On Order — ${address.name}`,
+          customer_name: address.name,
+          customer_email: address.email,
+          customer_phone: address.phone || "Not provided",
+          shape, length,
+          art_tier: ART_TIERS[artTier].label,
+          total: `$${total}`,
+          design_vision: design,
+          inspo_photo: inspoFile ? inspoFile.name : "None uploaded",
+          shipping: `${address.street}, ${address.city}, ${address.state} ${address.zip}`,
+          sizing: sizingSummary,
+          card_name: card.name,
+          card_last4: card.number.replace(/\s/g,"").slice(-4),
+        }),
+      });
+      if (res.ok) {
+        // Award loyalty points if member exists
+        const awarded = addPoints(address.email, 10, "Ordered a press-on set");
+        setDone(true);
+        if (awarded) setPressOnPointsAwarded(true);
+      } else {
+        setSubmitError("Something went wrong. Please try again or email eranailss@outlook.com directly.");
+      }
+    } catch {
+      setSubmitError("Connection error. Please try again.");
+    }
+    setSubmitting(false);
+  };
+
+  const reset = () => { setDone(false);setStep(1);setShape("");setLength("");setArtTier(0);setSizes({L:{},R:{}});setDesign("");setInspoFile(null);setAddress({name:"",street:"",city:"",state:"",zip:"",email:"",phone:""});setCard({name:"",number:"",exp:"",cvc:""});setSubmitError(""); };
 
   if (done) return (
     <Page>
@@ -602,6 +688,13 @@ function PressOnPage() {
             </div>
           </div>
           <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:G.sage, marginBottom:24 }}>Ready in <strong>7-10 business days</strong>. Lizzie will reach out with any design questions.</p>
+          {pressOnPointsAwarded && (
+            <div style={{ background:`linear-gradient(135deg,${G.forest},${G.mid})`, borderRadius:12, padding:16, marginBottom:24, color:"white", textAlign:"center" }}>
+              <div style={{ fontSize:"1.5rem", marginBottom:6 }}>💅</div>
+              <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.82rem", fontWeight:600, color:G.gold }}>+10 Loyalty Points Earned!</div>
+              <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:"rgba(255,255,255,0.6)", marginTop:4 }}>Added to your ERA loyalty account</div>
+            </div>
+          )}
           <button className="btn-dark" onClick={reset}>Order Another Set</button>
         </div>
       </div>
@@ -783,9 +876,12 @@ function PressOnPage() {
                   <div style={{ background:G.pale, borderRadius:10, padding:14, marginBottom:24 }}>
                     <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:G.sage, lineHeight:1.7 }}>🔒 Your card info is securely stored. You'll only be charged <strong>${total}</strong> once Lizzie confirms your order is ready to ship. Cancellation fee applies if order is cancelled after production begins.</div>
                   </div>
+                  {submitError && <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:"#F87171", marginBottom:14, textAlign:"center" }}>{submitError}</div>}
                   <div style={{ display:"flex", gap:12 }}>
                     <button className="btn-outline" style={{ flex:1 }} onClick={()=>setStep(4)}>← Back</button>
-                    <button className="btn-dark" style={{ flex:2 }} disabled={!s5ok} onClick={()=>setDone(true)}>Submit Order ✦</button>
+                    <button className="btn-dark" style={{ flex:2, opacity:submitting?0.7:1 }} disabled={!s5ok||submitting} onClick={submitOrder}>
+                      {submitting ? "Sending Order..." : "Submit Order ✦"}
+                    </button>
                   </div>
                 </div>
               )}
@@ -827,6 +923,7 @@ function LoyaltyPage({ onNav }) {
   const [member, setMember] = useState(null);
   const [form, setForm] = useState({ name:"", email:"", phone:"" });
   const [formError, setFormError] = useState("");
+  const [joining, setJoining] = useState(false);
   const [pts, setPts] = useState(0);
   const [redeemed, setRedeemed] = useState([]);
   const [toast, setToast] = useState(null);
@@ -836,10 +933,38 @@ function LoyaltyPage({ onNav }) {
 
   const showToast = (msg) => { setToast(msg); setTimeout(()=>setToast(null),3000); };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (!form.name || !form.email || !form.phone) { setFormError("Please fill in all fields to join."); return; }
-    setMember(form);
-    showToast(`Welcome to your new ERA, ${form.name}! 🌱`);
+    const existing = getMemberByEmail(form.email);
+    if (existing) {
+      setMember(existing);
+      setPts(existing.points || 0);
+      showToast(`Welcome back, ${existing.name.split(" ")[0]}! 💅`);
+      return;
+    }
+    setJoining(true);
+    setFormError("");
+    try {
+      await fetch("https://formspree.io/f/xvzdgwee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          subject: `🌱 New ERA Loyalty Member — ${form.name}`,
+          type: "LOYALTY SIGNUP",
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          starting_points: 5,
+          tier: "Bare Era",
+          note: "Add this member to the ERA loyalty spreadsheet.",
+        }),
+      });
+    } catch {}
+    const newMember = addMember(form.name, form.email, form.phone);
+    setJoining(false);
+    setMember(newMember);
+    setPts(newMember.points);
+    showToast(`Welcome to your new ERA, ${form.name}! You earned 5 pts 🌱`);
   };
 
   const redeem = (r) => {
@@ -891,8 +1016,8 @@ function LoyaltyPage({ onNav }) {
               </div>
             </div>
             {formError && <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:"#F87171", marginBottom:14 }}>{formError}</div>}
-            <button className="btn-gold" style={{ width:"100%", padding:"16px", fontSize:"0.85rem", letterSpacing:"0.2em" }} onClick={handleJoin}>
-              Join ERA — It's Free ✦
+            <button className="btn-gold" style={{ width:"100%", padding:"16px", fontSize:"0.85rem", letterSpacing:"0.2em", opacity:joining?0.7:1 }} onClick={handleJoin} disabled={joining}>
+              {joining ? "Joining..." : "Join ERA — It's Free ✦"}
             </button>
             <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.7rem", color:"rgba(255,255,255,0.3)", textAlign:"center", marginTop:14, lineHeight:1.6 }}>
               Free to join. Points earned through bookings and activity. Perks unlock as you level up.
@@ -1094,6 +1219,158 @@ function PolicyPage({ onNav }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // HOME
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// ADMIN PAGE — hidden, accessible by typing /admin in nav
+// ══════════════════════════════════════════════════════════════════════════════
+function AdminPage() {
+  const [password, setPassword] = useState("");
+  const [authed, setAuthed] = useState(false);
+  const [search, setSearch] = useState("");
+  const [found, setFound] = useState(null);
+  const [ptsToAdd, setPtsToAdd] = useState("");
+  const [reason, setReason] = useState("Booked a service");
+  const [msg, setMsg] = useState("");
+  const [allMembers, setAllMembers] = useState([]);
+
+  const ADMIN_PASS = "eranails2025";
+
+  const login = () => {
+    if (password === ADMIN_PASS) { setAuthed(true); setAllMembers(getMembers()); }
+    else setMsg("Wrong password.");
+  };
+
+  const searchMember = () => {
+    const m = getMemberByEmail(search);
+    setFound(m);
+    setMsg(m ? "" : "No member found with that email.");
+  };
+
+  const handleAddPoints = () => {
+    if (!found || !ptsToAdd) return;
+    const ok = addPoints(found.email, parseInt(ptsToAdd), reason);
+    if (ok) {
+      setMsg(`✅ Added ${ptsToAdd} pts to ${found.name} for "${reason}"`);
+      setFound(getMemberByEmail(found.email));
+      setAllMembers(getMembers());
+      setPtsToAdd("");
+    }
+  };
+
+  const getTierName = (pts) => getTier(pts).name;
+
+  if (!authed) return (
+    <Page>
+      <div style={{ minHeight:"100vh", background:G.dark, display:"flex", alignItems:"center", justifyContent:"center", padding:40 }}>
+        <div style={{ background:"rgba(255,255,255,0.05)", borderRadius:20, padding:40, maxWidth:400, width:"100%", border:"1px solid rgba(200,169,110,0.2)" }}>
+          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.8rem", color:G.cream, marginBottom:8, textAlign:"center" }}>ERA Admin</div>
+          <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:G.sage, textAlign:"center", marginBottom:24 }}>Lizzie's loyalty dashboard</div>
+          <label style={{ color:"rgba(255,255,255,0.5)" }}>Password</label>
+          <input type="password" placeholder="Enter admin password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()} style={{ background:"rgba(255,255,255,0.08)", borderColor:"rgba(255,255,255,0.15)", color:"white", marginBottom:14 }}/>
+          {msg && <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:"#F87171", marginBottom:12 }}>{msg}</div>}
+          <button className="btn-gold" style={{ width:"100%" }} onClick={login}>Log In</button>
+        </div>
+      </div>
+    </Page>
+  );
+
+  return (
+    <Page>
+      <div style={{ minHeight:"100vh", background:G.cream, padding:"60px 40px" }}>
+        <div style={{ maxWidth:900, margin:"0 auto" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:40 }}>
+            <div>
+              <div className="section-label">Lizzie's Dashboard</div>
+              <h2 className="section-title">ERA Loyalty Admin</h2>
+            </div>
+            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:G.sage }}>{allMembers.length} total members</div>
+          </div>
+
+          {/* Add Points */}
+          <div style={{ background:"white", borderRadius:16, padding:28, boxShadow:"0 4px 24px rgba(27,58,45,0.06)", marginBottom:28 }}>
+            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", color:G.forest, marginBottom:16 }}>Add Points to a Member</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:10, marginBottom:14 }}>
+              <input placeholder="Search by email" value={search} onChange={e=>setSearch(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchMember()}/>
+              <button className="btn-dark" style={{ padding:"12px 20px" }} onClick={searchMember}>Find</button>
+            </div>
+            {found && (
+              <div style={{ background:G.pale, borderRadius:12, padding:20, marginBottom:14 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+                  <div>
+                    <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.2rem", color:G.text }}>{found.name}</div>
+                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.74rem", color:G.sage }}>{found.email} · {found.phone}</div>
+                  </div>
+                  <div style={{ textAlign:"right" }}>
+                    <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.8rem", color:G.forest, lineHeight:1 }}>{found.points}</div>
+                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.65rem", color:G.sage }}>pts · {getTierName(found.points)}</div>
+                  </div>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr auto", gap:10 }}>
+                  <input placeholder="Points to add (e.g. 10)" value={ptsToAdd} onChange={e=>setPtsToAdd(e.target.value.replace(/\D/g,""))} style={{ background:"white" }}/>
+                  <select value={reason} onChange={e=>setReason(e.target.value)} style={{ background:"white" }}>
+                    <option>Booked a service</option>
+                    <option>Rebooked</option>
+                    <option>Left a review</option>
+                    <option>Referred a friend</option>
+                    <option>Birthday bonus</option>
+                    <option>Shared on social</option>
+                    <option>Manual adjustment</option>
+                  </select>
+                  <button className="btn-dark" style={{ padding:"12px 20px" }} onClick={handleAddPoints} disabled={!ptsToAdd}>Add</button>
+                </div>
+                {/* Point history */}
+                {found.history?.length > 0 && (
+                  <div style={{ marginTop:14 }}>
+                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.65rem", color:G.sage, fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>History</div>
+                    {[...found.history].reverse().map((h,i) => (
+                      <div key={i} style={{ display:"flex", justifyContent:"space-between", fontFamily:"'Jost',sans-serif", fontSize:"0.76rem", color:G.text, padding:"6px 0", borderBottom:i<found.history.length-1?`1px solid ${G.pale}`:"none" }}>
+                        <span>{h.action}</span>
+                        <span style={{ color:G.forest, fontWeight:600 }}>+{h.pts} pts · {h.date}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {msg && <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:msg.startsWith("✅")?G.forest:"#F87171" }}>{msg}</div>}
+          </div>
+
+          {/* All Members */}
+          <div style={{ background:"white", borderRadius:16, overflow:"hidden", boxShadow:"0 4px 24px rgba(27,58,45,0.06)" }}>
+            <div style={{ padding:"20px 28px", borderBottom:`1px solid ${G.pale}` }}>
+              <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", color:G.forest }}>All Members ({allMembers.length})</div>
+            </div>
+            {allMembers.length === 0 ? (
+              <div style={{ padding:40, textAlign:"center", fontFamily:"'Jost',sans-serif", fontSize:"0.84rem", color:G.sage }}>No members yet — they'll appear here when someone joins.</div>
+            ) : (
+              allMembers.map((m,i) => (
+                <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr auto auto auto", gap:16, alignItems:"center", padding:"16px 28px", borderBottom:i<allMembers.length-1?`1px solid ${G.pale}`:"none" }}>
+                  <div>
+                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.84rem", fontWeight:500, color:G.text }}>{m.name}</div>
+                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:G.sage }}>{m.email} · {m.phone}</div>
+                  </div>
+                  <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:G.sage }}>{getTierName(m.points)}</div>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.2rem", color:G.forest, fontWeight:600 }}>{m.points} pts</div>
+                  <button style={{ background:G.pale, border:"none", borderRadius:8, padding:"6px 12px", fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", color:G.forest, cursor:"pointer" }} onClick={()=>{ setSearch(m.email); setFound(m); setMsg(""); window.scrollTo({top:0,behavior:"smooth"}); }}>Manage</button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Quick add guide */}
+          <div style={{ marginTop:24, background:`linear-gradient(135deg,${G.forest},${G.mid})`, borderRadius:16, padding:24, color:"white" }}>
+            <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.2em", textTransform:"uppercase", color:G.gold, marginBottom:14 }}>Quick Points Guide</div>
+            {[["Booked a service","+10 pts"],["Rebooked","+10 pts"],["Left a review","+20 pts"],["Referred a friend","+50 pts"],["Birthday bonus","+30 pts"],["Shared on social","+15 pts"]].map(([a,p])=>(
+              <div key={a} style={{ display:"flex", justifyContent:"space-between", fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.7)", padding:"6px 0", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+                <span>{a}</span><span style={{ color:G.gold, fontWeight:600 }}>{p}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Page>
+  );
+}
+
 function HomePage({ onNav }) {
   return (
     <div>
@@ -1201,12 +1478,13 @@ export default function EraApp() {
       {section==="loyalty"  && <LoyaltyPage onNav={navigate}/>}
       {section==="reviews"  && <ReviewsPage/>}
       {section==="policy"   && <PolicyPage onNav={navigate}/>}
+      {section==="admin"    && <AdminPage/>}
 
       <footer style={{ background:G.dark, padding:"48px 40px 32px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:32, marginBottom:40 }}>
             <div>
-              <Logo size={32}/>
+              <div onClick={()=>navigate("admin")} style={{ cursor:"default" }}><Logo size={32}/></div>
               <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.78rem", color:G.sage, marginTop:14, maxWidth:210, lineHeight:1.75 }}>Luxury nail studio by Lizzie. Ashley, Indiana.</p>
               <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.82rem", color:"rgba(200,169,110,0.4)", marginTop:8, letterSpacing:"0.1em" }}>which era are you in?</div>
               <div style={{ marginTop:14 }}>
