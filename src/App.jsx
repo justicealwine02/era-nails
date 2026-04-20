@@ -634,7 +634,7 @@ function PressOnPage() {
       `${hand==="L"?"Left":"Right"}: ${FINGERS.map(f=>`${f}=${sizes[hand][f]||"?"}`).join(", ")}`
     ).join(" | ");
     try {
-      const res = await fetch("https://formspree.io/f/xvzdgwee", {
+      const res = await fetch("https://formspree.io/f/xeevlekg", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
@@ -945,7 +945,7 @@ function LoyaltyPage({ onNav }) {
     setJoining(true);
     setFormError("");
     try {
-      await fetch("https://formspree.io/f/xvzdgwee", {
+      await fetch("https://formspree.io/f/xeevlekg", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
