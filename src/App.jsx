@@ -83,7 +83,7 @@ const ART_TIERS = [
   { label: "Tier 3 — Detailed", price: 15, desc: "Full handpainted detailed art" },
 ];
 
-const NAV_ITEMS = ["About","Services","Gallery","Book","Press-Ons","Loyalty","Reviews","Policy"];
+const NAV_ITEMS = ["About","Services","Gallery","Book","Press-Ons","Reviews","Policy"];
 
 // ─── Loyalty Storage Helpers ──────────────────────────────────────────────────
 const STORAGE_KEY = "era_loyalty_members";
@@ -1475,7 +1475,6 @@ export default function EraApp() {
       {section==="gallery"  && <GalleryPage/>}
       {section==="book"     && <BookPage/>}
       {section==="pressons" && <PressOnPage/>}
-      {section==="loyalty"  && <LoyaltyPage onNav={navigate}/>}
       {section==="reviews"  && <ReviewsPage/>}
       {section==="policy"   && <PolicyPage onNav={navigate}/>}
       {section==="admin"    && <AdminPage/>}
